@@ -27,6 +27,7 @@ jobs:
       - name: Terraform plan
         continue-on-error: true
         run: |
+          set -o errexit
           terraform fmt -recursive -check -diff
           terraform validate
           terraform init
@@ -91,6 +92,7 @@ jobs:
 
       - name: Terraform apply
         run: |
+          set -o errexit
           terraform init
           terraform get
           terraform show "tf_plan.out"
