@@ -9,4 +9,4 @@ namespace: default
 images:
 - name: go-example-argocd
   newName: danielvincenzi/go-example-argocd
-  newTag: c20c18f1cfbfc8b9e3303711b17f0e9b04cf1a6f
+  newTag: 7505ce584254fa4d48b7df602bda985386d76d53
