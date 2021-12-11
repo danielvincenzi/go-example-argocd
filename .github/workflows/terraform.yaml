@@ -26,6 +26,7 @@ jobs:
 
       - name: Terraform plan
         continue-on-error: true
+        working-directory: terraform/
         run: |
           set -o errexit
           terraform fmt -recursive -check -diff
@@ -91,6 +92,7 @@ jobs:
           path: terraform
 
       - name: Terraform apply
+        working-directory: terraform/
         run: |
           set -o errexit
           terraform init
