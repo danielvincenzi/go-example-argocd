@@ -2,6 +2,7 @@ name: Terraform
 on:
   push:
     paths:
+      - ".github/**"
       - "terraform/**"
   # pull_request:
   #   branches:
