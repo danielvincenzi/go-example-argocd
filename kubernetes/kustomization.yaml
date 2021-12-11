@@ -8,5 +8,5 @@ namespace: go-example-argocd
 
 images:
 - name: go-example-argocd
-  newName: go-example-argocd
-  newTag: v1
+  newName: danielvincenzi/go-example-argocd
+  newTag: 3a35e70d41f3bf23ce14d71a9e19590d90fe9f18
