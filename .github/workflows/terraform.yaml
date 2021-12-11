@@ -32,10 +32,10 @@ jobs:
         continue-on-error: true
         run: |
           set -o errexit
-          terraform fmt -recursive -check -diff
-          terraform validate
           terraform init
           terraform get
+          terraform fmt -recursive -check -diff
+          terraform validate
           terraform plan -out "tf_plan.out" -input=false
 
       - name: Upload Terraform plan
