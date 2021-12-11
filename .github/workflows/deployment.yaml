@@ -41,7 +41,7 @@ jobs:
         run: |
           git config --local user.name "GitHub Actions"
           git add .
-          git commit -m "Set `go-example-argocd` image tag to `${{ github.sha }}`"
+          git commit -m 'Set `go-example-argocd` image tag to `${{ github.sha }}`'
 
       - name: Push
         uses: ad-m/github-push-action@master
