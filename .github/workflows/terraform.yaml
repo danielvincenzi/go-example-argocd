@@ -55,9 +55,8 @@ jobs:
         run: exit 1
 
       - name: Update pull request with Terraform plan results
-        uses: actions/github-script@v5
-        # if: github.event_name == 'pull_request'
-        if: github.event_name == 'push' || github.event_name != 'pull_request'
+        uses: actions/github-script@0.9.0
+        if: github.event_name != 'pull_request'
         env:
           TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
         with:
@@ -65,20 +64,20 @@ jobs:
           script: |
             const output = `#### Terraform format and style 🖌\`${{ steps.terraform_fmt.outcome }}\`
             #### Terraform initialization ⚙️\`${{ steps.terraform_init.outcome }}\`
+            #### Terraform validation 🤖\`${{ steps.terraform_validate.outputs.stdout }}\`
             #### Terraform plan 📖\`${{ steps.terraform_plan.outcome }}\`
-            #### Terraform validation 🤖\`${{ steps.terraform_validate.outcome }}\`
-
+            
             <details><summary>Show plan</summary>
-
+            
             \`\`\`\n
             ${process.env.TERRAFORM_PLAN}
             \`\`\`
-
+            
             </details>
-
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-            github.rest.issues.createComment({
+            
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+              
+            github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
