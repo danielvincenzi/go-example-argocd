@@ -1,4 +1,4 @@
-name: Terraform
+name: Infrastructure as Code
 
 on:
   push:
@@ -43,8 +43,8 @@ jobs:
 
       - name: Terraform plan
         id: terraform_plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan
+        # if: github.event_name == 'pull_request'
+        run: terraform plan -no-color
         continue-on-error: true
 
       - name: Terraform plan status
@@ -59,10 +59,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform format and style 🖌\`${{ steps.terraform_fmt.outcome }}\`
-            #### Terraform initialization ⚙️\`${{ steps.terraform_init.outcome }}\`
-            #### Terraform validation 🤖\`${{ steps.terraform_validate.outputs.stdout }}\`
-            #### Terraform plan 📖\`${{ steps.terraform_plan.outcome }}\`
+            const output = `#### Terraform format and style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
+            #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
+            #### Terraform validation 🤖: \${{ steps.terraform_validate.outputs.stdout }}\
+            #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
             
             <details><summary>Show plan</summary>
             
