@@ -12,4 +12,4 @@ images:
   newTag: 213b1057428057700afc94f3564eb3f4050e1a66
 - name: go-example-argocd
   newName: danielvincenzi/go-example-argocd
-  newTag: 9e913724257fe87ce2f76405d96fbb7f5c3f75fe
+  newTag: 4154725f49d9ae5a79a39ce471a7612165cac723
