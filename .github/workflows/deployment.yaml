@@ -39,3 +39,33 @@ jobs:
           repository: danielvincenzi/go-example-argocd
           tags: ${{ github.sha }}, latest
           # labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Kustomize
+        uses: imranismail/kustomize-action@v1
+        with:
+          kustomize_version: v3
+
+      - name: Update Kubernetes
+        run: |
+          cd kubernetes
+          kustomize edit set image go-example-argocd=danielvincenzi/go-example-argocd:${{ github.sha }}
+          cat kustomization.yaml
+
+      - name: Commit
+        run: |
+          git config --local user.name "GitHub Actions"
+          git add .
+          git commit -m "Deployment: ${{ github.sha }}"
+
+      - name: Push
+        uses: ad-m/github-push-action@master
+

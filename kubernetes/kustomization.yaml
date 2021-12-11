@@ -1,12 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - deployment.yaml
-  - service.yaml
+- deployment.yaml
+- service.yaml
 
 namespace: go-example-argocd
 
 images:
-  - name: go-example-argocd
-    newName: danielvincenzi/go-example-argocd
-    newTag: v1
+- name: go-example-argocd
+  newName: go-example-argocd
+  newTag: v1

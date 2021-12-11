@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: go-example-argocd
-        image: danielvincenzi/go-example-argocd
+        image: go-example-argocd
         resources:
           limits:
             memory: "128Mi"
