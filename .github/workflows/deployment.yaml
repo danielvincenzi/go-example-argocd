@@ -34,14 +34,14 @@ jobs:
       - name: Update Kubernetes
         run: |
           cd kubernetes
-          kustomize edit set image ${{ github.repository }}=danielvincenzi/${{ github.repository }}:${{ github.sha }}
+          kustomize edit set image go-example-argocd=danielvincenzi/go-example-argocd:${{ github.sha }}
           cat kustomization.yaml
 
       - name: Commit
         run: |
-          git config --local user.name '${{ github.actor }}'
+          git config --local user.name 'GitHub Actions'
           git add .
-          git commit -m 'Set `${{ github.repository }}` image tag to `${{ github.sha }}`'
+          git commit -m 'Set image tag to `${{ github.sha }}`'
 
       - name: Push
         uses: ad-m/github-push-action@master
