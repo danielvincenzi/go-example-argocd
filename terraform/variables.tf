@@ -1,4 +1,4 @@
 variable "aws_ecr_repository" {
-  type = string
+  type    = string
   default = "go-example-argocd"
 }
