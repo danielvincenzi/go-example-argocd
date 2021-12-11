@@ -17,6 +17,4 @@ jobs:
           username: danielvincenzi
           password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
           repository: danielvincenzi/go-example-argocd
-          tags:
-            - ${{ github.sha }}
-            - latest
+          tags: ${{ github.sha }}, latest
