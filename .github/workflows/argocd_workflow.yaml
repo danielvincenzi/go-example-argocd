@@ -72,7 +72,7 @@ jobs:
       - name: Update Kubernetes
         run: |
           cd kubernetes
-          kustomize edit set image go-example-argocd=danielvincenzi/go-example-argocd:${{ github.sha }}
+          kustomize edit set image go-example-argocd=260712519057.dkr.ecr.us-east-1.amazonaws.com/go-example-argocd:${{ github.sha }}
           cat kustomization.yaml
 
       - name: Commit
