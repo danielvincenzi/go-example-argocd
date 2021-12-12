@@ -55,24 +55,24 @@ jobs:
         uses: actions/github-script@0.9.0
         if: github.event_name == 'pull_request'
         env:
-          TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
+          TF_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform format and style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
-            #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
-            #### Terraform validation 🤖: \${{ steps.terraform_validate.outputs.stdout }}\
-            #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
+            const output = `#### `terraform fmt` 🖌: \`${{ steps.terraform_fmt.outcome }}\`
+            #### `terraform init` ⚙️: \`${{ steps.terraform_init.outcome }}\`
+            #### `terraform validate` 🤖: \`${{ steps.terraform_validate.outputs.stdout }}\`
+            #### `terraform plan` 📖: \`${{ steps.terraform_plan.outcome }}\`
             
-            <details><summary>Show plan</summary>
+            <details><summary>Show plan:</summary>
             
             \`\`\`\n
-            ${process.env.TERRAFORM_PLAN}
+            ${process.env.TF_PLAN}
             \`\`\`
             
             </details>
             
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
               
             github.issues.createComment({
               issue_number: context.issue.number,
