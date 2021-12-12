@@ -1,0 +1,86 @@
+name: Infrastructure as a code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths:
+      - ".github/**"
+      - "terraform/**"
+
+defaults:
+  run:
+    working-directory: ./terraform
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get Terraform credentials
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.0
+          cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
+
+      - name: Terraform fmt
+        id: terraform_fmt
+        run: terraform fmt -recursive -check -diff
+
+      - name: Terraform init
+        id: terraform_init
+        run: |
+          terraform init
+          terraform get
+
+      - name: Terraform validate
+        id: terraform_validate
+        run: terraform validate -no-color
+
+      - name: Terraform plan
+        id: terraform_plan
+        # if: github.event_name == 'pull_request'
+        run: terraform plan -no-color
+        continue-on-error: true
+
+      - name: Terraform plan status
+        if: steps.terraform_plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Update pull request with Terraform plan results
+        uses: actions/github-script@0.9.0
+        if: github.event_name == 'pull_request'
+        env:
+          TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform format & style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
+            #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
+            #### Terraform validation 🤖: \${{ steps.terraform_validate.outputs.stdout }}\
+            #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
+
+            <details><summary>Show plan</summary>
+
+            \`\`\`\n
+            ${process.env.TERRAFORM_PLAN}
+            \`\`\`
+
+            </details>
+
+            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve
