@@ -59,10 +59,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### `terraform fmt` 🖌\`${{ steps.terraform_fmt.outcome }}\`
-            #### `terraform init` ⚙️\`${{ steps.terraform_init.outcome }}\`
-            #### `terraform validate` 🤖\`${{ steps.terraform_validate.outputs.stdout }}\`
-            #### `terraform plan` 📖\`${{ steps.terraform_plan.outcome }}\`
+            const output = `#### Terraform format & style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
+            #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
+            #### Terraform validation 🤖: \`${{ steps.terraform_validate.outputs.stdout }}\`
+            #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
 
             <details><summary>Show plan</summary>
 
