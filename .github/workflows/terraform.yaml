@@ -1,4 +1,4 @@
-name: Infrastructure as Code
+name: Infrastructure as a code
 
 on:
   push:
@@ -55,25 +55,25 @@ jobs:
         uses: actions/github-script@0.9.0
         if: github.event_name == 'pull_request'
         env:
-          TF_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
+          TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### `terraform fmt` 🖌: \`${{ steps.terraform_fmt.outcome }}\`
-            #### `terraform init` ⚙️: \`${{ steps.terraform_init.outcome }}\`
-            #### `terraform validate` 🤖: \`${{ steps.terraform_validate.outputs.stdout }}\`
-            #### `terraform plan` 📖: \`${{ steps.terraform_plan.outcome }}\`
-            
+            const output = `#### `terraform fmt` 🖌\`${{ steps.terraform_fmt.outcome }}\`
+            #### `terraform init` ⚙️\`${{ steps.terraform_init.outcome }}\`
+            #### `terraform validate` 🤖\`${{ steps.terraform_validate.outputs.stdout }}\`
+            #### `terraform plan` 📖\`${{ steps.terraform_plan.outcome }}\`
+
             <details><summary>Show plan</summary>
-            
+
             \`\`\`\n
-            ${process.env.TF_PLAN}
+            ${process.env.TERRAFORM_PLAN}
             \`\`\`
-            
+
             </details>
-            
-            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
-              
+
+            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
