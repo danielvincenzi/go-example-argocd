@@ -15,6 +15,7 @@ spec:
       labels:
         app: go-example-argocd
     spec:
+      ImagePullSecrets: us-east-1-ecr-registry
       containers:
       - name: go-example-argocd
         image: go-example-argocd
