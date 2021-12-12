@@ -1,24 +1,24 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: go-example-argocd
-spec:
-  selector:
-    matchLabels:
-      app: go-example-argocd
-  template:
-    metadata:
-      labels:
-        app: go-example-argocd
-    spec:
-      containers:
-      - name: go-example-argocd
-        image: go-example-argocd
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
-        ports:
-        - containerPort: 8080
-      imagePullSecrets:
-        - name: us-east-1-ecr-registry
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: go-example-argocd
+# spec:
+#   selector:
+#     matchLabels:
+#       app: go-example-argocd
+#   template:
+#     metadata:
+#       labels:
+#         app: go-example-argocd
+#     spec:
+#       containers:
+#       - name: go-example-argocd
+#         image: go-example-argocd
+#         resources:
+#           limits:
+#             memory: "128Mi"
+#             cpu: "500m"
+#         ports:
+#         - containerPort: 8080
+#       imagePullSecrets:
+#         - name: us-east-1-ecr-registry
