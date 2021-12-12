@@ -64,7 +64,7 @@ jobs:
             #### `terraform validate` 🤖: \`${{ steps.terraform_validate.outputs.stdout }}\`
             #### `terraform plan` 📖: \`${{ steps.terraform_plan.outcome }}\`
             
-            <details><summary>Show plan:</summary>
+            <details><summary>Show plan</summary>
             
             \`\`\`\n
             ${process.env.TF_PLAN}
