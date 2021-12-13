@@ -31,6 +31,6 @@ spec:
               cpu: 5m
   strategy:
     blueGreen:
-      autoPromotionEnabled: false
+      autoPromotionEnabled: true
       activeService: go-example-argocd
       previewService: go-example-argocd-preview

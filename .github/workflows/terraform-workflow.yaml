@@ -1,4 +1,4 @@
-name: Infrastructure as a code
+name: Terraform workflow
 
 on:
   push:
