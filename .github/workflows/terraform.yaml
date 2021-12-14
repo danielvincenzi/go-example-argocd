@@ -17,8 +17,6 @@ jobs:
   terraform_plan_development:
     name: Terraform plan (development)
     runs-on: ubuntu-latest
-    environment:
-      name: development
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -111,8 +109,6 @@ jobs:
   terraform_plan_staging:
     name: Terraform plan (staging)
     runs-on: ubuntu-latest
-    environment:
-      name: staging
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -205,8 +201,6 @@ jobs:
   terraform_plan_production:
     name: Terraform plan (production)
     runs-on: ubuntu-latest
-    environment:
-      name: production
     steps:
       - name: Checkout
         uses: actions/checkout@v2
