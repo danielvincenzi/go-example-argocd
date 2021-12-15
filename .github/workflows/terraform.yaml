@@ -88,10 +88,10 @@ jobs:
               body: output
             })
 
-  terraform_apply_development:
-    name: Terraform apply (development)
+  terraform_apply:
+    name: Apply
     runs-on: ubuntu-latest
-    needs: terraform_plan_development
+    needs: terraform_plan
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     strategy:
       matrix:
