@@ -14,9 +14,16 @@ defaults:
     working-directory: ./terraform
 
 jobs:
-  terraform_plan_development:
-    name: Terraform plan (development)
+  terraform_plan:
+    name: Plan
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [
+          development,
+          staging,
+          production
+        ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -27,31 +34,31 @@ jobs:
           terraform_version: 1.1.0
           cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
 
-      - name: Terraform fmt
+      - name: Format
         id: terraform_fmt
         run: terraform fmt -recursive -check -diff
 
-      - name: Terraform init
+      - name: Initialize
         id: terraform_init
         run: |
           terraform init
           terraform get
 
-      - name: Terraform validate
+      - name: Validate
         id: terraform_validate
         run: terraform validate -no-color
 
-      - name: Terraform plan
+      - name: Plan
         id: terraform_plan
         # if: github.event_name == 'pull_request'
         run: terraform plan -no-color
         continue-on-error: true
 
-      - name: Terraform plan status
+      - name: Plan status
         if: steps.terraform_plan.outcome == 'failure'
         run: exit 1
 
-      - name: Update pull request with Terraform plan results
+      - name: Update pull request
         uses: actions/github-script@0.9.0
         if: github.event_name == 'pull_request'
         env:
@@ -72,7 +79,7 @@ jobs:
 
             </details>
 
-            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
             github.issues.createComment({
               issue_number: context.issue.number,
@@ -86,8 +93,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform_plan_development
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    strategy:
+      matrix:
+        environment: [
+          development,
+          staging,
+          production
+        ]
     environment:
-      name: development
+      name: ${{ matrix.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -104,188 +118,188 @@ jobs:
           terraform get
 
       - name: Terraform apply
-        run: terraform apply -auto-approve
+        run: terraform apply -var-file=development.tfvars -auto-approve
 
-  terraform_plan_staging:
-    name: Terraform plan (staging)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+  # terraform_plan_staging:
+  #   name: Terraform plan (staging)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-      - name: Set Terraform credentials
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.0
-          cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
+  #     - name: Set Terraform credentials
+  #       uses: hashicorp/setup-terraform@v1
+  #       with:
+  #         terraform_version: 1.1.0
+  #         cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
 
-      - name: Terraform fmt
-        id: terraform_fmt
-        run: terraform fmt -recursive -check -diff
+  #     - name: Terraform fmt
+  #       id: terraform_fmt
+  #       run: terraform fmt -recursive -check -diff
 
-      - name: Terraform init
-        id: terraform_init
-        run: |
-          terraform init
-          terraform get
+  #     - name: Terraform init
+  #       id: terraform_init
+  #       run: |
+  #         terraform init
+  #         terraform get
 
-      - name: Terraform validate
-        id: terraform_validate
-        run: terraform validate -no-color
+  #     - name: Terraform validate
+  #       id: terraform_validate
+  #       run: terraform validate -no-color
 
-      - name: Terraform plan
-        id: terraform_plan
-        # if: github.event_name == 'pull_request'
-        run: terraform plan -no-color
-        continue-on-error: true
+  #     - name: Terraform plan
+  #       id: terraform_plan
+  #       # if: github.event_name == 'pull_request'
+  #       run: terraform plan -var-file=staging.tfvars -no-color
+  #       continue-on-error: true
 
-      - name: Terraform plan status
-        if: steps.terraform_plan.outcome == 'failure'
-        run: exit 1
+  #     - name: Terraform plan status
+  #       if: steps.terraform_plan.outcome == 'failure'
+  #       run: exit 1
 
-      - name: Update pull request with Terraform plan results
-        uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
-        env:
-          TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform format & style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
-            #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
-            #### Terraform validation 🤖: \${{ steps.terraform_validate.outputs.stdout }}\
-            #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
+  #     - name: Update pull request with Terraform plan results
+  #       uses: actions/github-script@0.9.0
+  #       if: github.event_name == 'pull_request'
+  #       env:
+  #         TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         script: |
+  #           const output = `#### Terraform format & style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
+  #           #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
+  #           #### Terraform validation 🤖: \${{ steps.terraform_validate.outputs.stdout }}\
+  #           #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
 
-            <details><summary>Show plan</summary>
+  #           <details><summary>Show plan</summary>
 
-            \`\`\`\n
-            ${process.env.TERRAFORM_PLAN}
-            \`\`\`
+  #           \`\`\`\n
+  #           ${process.env.TERRAFORM_PLAN}
+  #           \`\`\`
 
-            </details>
+  #           </details>
 
-            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+  #           *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+  #           github.issues.createComment({
+  #             issue_number: context.issue.number,
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             body: output
+  #           })
 
-  terraform_apply_staging:
-    name: Terraform apply (staging)
-    runs-on: ubuntu-latest
-    needs: terraform_plan_staging
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: staging
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+  # terraform_apply_staging:
+  #   name: Terraform apply (staging)
+  #   runs-on: ubuntu-latest
+  #   needs: terraform_plan_staging
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   environment:
+  #     name: staging
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-      - name: Set Terraform credentials
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.0
-          cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
+  #     - name: Set Terraform credentials
+  #       uses: hashicorp/setup-terraform@v1
+  #       with:
+  #         terraform_version: 1.1.0
+  #         cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
 
-      - name: Terraform init
-        run: |
-          terraform init
-          terraform get
+  #     - name: Terraform init
+  #       run: |
+  #         terraform init
+  #         terraform get
 
-      - name: Terraform apply
-        run: terraform apply -auto-approve
+  #     - name: Terraform apply
+  #       run: terraform apply -var-file=staging.tfvars -auto-approve
 
-  terraform_plan_production:
-    name: Terraform plan (production)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+  # terraform_plan_production:
+  #   name: Terraform plan (production)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-      - name: Set Terraform credentials
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.0
-          cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
+  #     - name: Set Terraform credentials
+  #       uses: hashicorp/setup-terraform@v1
+  #       with:
+  #         terraform_version: 1.1.0
+  #         cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
 
-      - name: Terraform fmt
-        id: terraform_fmt
-        run: terraform fmt -recursive -check -diff
+  #     - name: Terraform fmt
+  #       id: terraform_fmt
+  #       run: terraform fmt -recursive -check -diff
 
-      - name: Terraform init
-        id: terraform_init
-        run: |
-          terraform init
-          terraform get
+  #     - name: Terraform init
+  #       id: terraform_init
+  #       run: |
+  #         terraform init
+  #         terraform get
 
-      - name: Terraform validate
-        id: terraform_validate
-        run: terraform validate -no-color
+  #     - name: Terraform validate
+  #       id: terraform_validate
+  #       run: terraform validate -no-color
 
-      - name: Terraform plan
-        id: terraform_plan
-        # if: github.event_name == 'pull_request'
-        run: terraform plan -no-color
-        continue-on-error: true
+  #     - name: Terraform plan
+  #       id: terraform_plan
+  #       # if: github.event_name == 'pull_request'
+  #       run: terraform plan -var-file=production.tfvars -no-color
+  #       continue-on-error: true
 
-      - name: Terraform plan status
-        if: steps.terraform_plan.outcome == 'failure'
-        run: exit 1
+  #     - name: Terraform plan status
+  #       if: steps.terraform_plan.outcome == 'failure'
+  #       run: exit 1
 
-      - name: Update pull request with Terraform plan results
-        uses: actions/github-script@0.9.0
-        if: github.event_name == 'pull_request'
-        env:
-          TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform format & style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
-            #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
-            #### Terraform validation 🤖: \${{ steps.terraform_validate.outputs.stdout }}\
-            #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
+  #     - name: Update pull request with Terraform plan results
+  #       uses: actions/github-script@0.9.0
+  #       if: github.event_name == 'pull_request'
+  #       env:
+  #         TERRAFORM_PLAN: "terraform\n${{ steps.terraform_plan.outputs.stdout }}"
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         script: |
+  #           const output = `#### Terraform format & style 🖌: \`${{ steps.terraform_fmt.outcome }}\`
+  #           #### Terraform initialization ⚙️: \`${{ steps.terraform_init.outcome }}\`
+  #           #### Terraform validation 🤖: \${{ steps.terraform_validate.outputs.stdout }}\
+  #           #### Terraform plan 📖: \`${{ steps.terraform_plan.outcome }}\`
 
-            <details><summary>Show plan</summary>
+  #           <details><summary>Show plan</summary>
 
-            \`\`\`\n
-            ${process.env.TERRAFORM_PLAN}
-            \`\`\`
+  #           \`\`\`\n
+  #           ${process.env.TERRAFORM_PLAN}
+  #           \`\`\`
 
-            </details>
+  #           </details>
 
-            *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.tf_actions_working_dir }}\`, Workflow: \`${{ github.workflow }}\`*`;
+  #           *Actor: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ env.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+  #           github.issues.createComment({
+  #             issue_number: context.issue.number,
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             body: output
+  #           })
 
-  terraform_apply_production:
-    name: Terraform apply (production)
-    runs-on: ubuntu-latest
-    needs: terraform_plan_production
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: production
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+  # terraform_apply_production:
+  #   name: Terraform apply (production)
+  #   runs-on: ubuntu-latest
+  #   needs: terraform_plan_production
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   environment:
+  #     name: production
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v2
 
-      - name: Set Terraform credentials
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 1.1.0
-          cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
+  #     - name: Set Terraform credentials
+  #       uses: hashicorp/setup-terraform@v1
+  #       with:
+  #         terraform_version: 1.1.0
+  #         cli_config_credentials_token: ${{ secrets.TERRAFORM_API_TOKEN }}
 
-      - name: Terraform init
-        run: |
-          terraform init
-          terraform get
+  #     - name: Terraform init
+  #       run: |
+  #         terraform init
+  #         terraform get
 
-      - name: Terraform apply
-        run: terraform apply -auto-approve
+  #     - name: Terraform apply
+  #       run: terraform apply -var-file=production.tfvars -auto-approve
