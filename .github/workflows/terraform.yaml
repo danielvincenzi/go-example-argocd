@@ -5,13 +5,13 @@ on:
     branches:
       - main
   pull_request:
-    paths:
-      - ".github/**"
-      - "terraform/**"
+    paths-ignore:
+      # - "docs/**"
+      - "kubernetes/**"
 
 defaults:
   run:
-    working-directory: ./terraform
+    working-directory: "terraform/"
 
 jobs:
   terraform_plan:
@@ -118,7 +118,7 @@ jobs:
           terraform get
 
       - name: Terraform apply
-        run: terraform apply -var-file=development.tfvars -auto-approve
+        run: terraform apply -auto-approve
 
   # terraform_plan_staging:
   #   name: Terraform plan (staging)
