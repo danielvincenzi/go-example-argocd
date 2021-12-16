@@ -80,7 +80,7 @@ jobs:
         run: |
           git config --local user.name 'github-actions[ bot ]'
           git add .
-          git commit -m 'Trigger sync on ArgoCD @ `${{ github.sha }}`'
+          git commit -m 'Trigger ArgoCD sync (`${{ github.sha }}`)'
 
       - name: Push changes
         uses: ad-m/github-push-action@master
