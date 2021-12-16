@@ -10,4 +10,4 @@ namespace: default
 images:
 - name: go-example-argocd
   newName: 260712519057.dkr.ecr.us-east-1.amazonaws.com/go-example-argocd
-  newTag: cdce016d970071fb9a1497fab30d7e1d2ffbe51d
+  newTag: 030d2c9508c339f8f78527caf31fca9cf78e7570
