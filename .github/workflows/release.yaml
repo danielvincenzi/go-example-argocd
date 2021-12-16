@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      # - "docs/**"
+      - "terraform/**"
   pull_request:
     paths-ignore:
       # - "docs/**"
@@ -34,7 +37,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Set AWS credentials
+      - name: Get AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: us-east-1
@@ -73,12 +76,12 @@ jobs:
         run: |
           kustomize edit set image go-example-argocd=260712519057.dkr.ecr.us-east-1.amazonaws.com/go-example-argocd:${{ github.sha }}
 
-      - name: Commit changes
+      - name: Commit
         run: |
           git config --local user.name 'github-actions[ bot ]'
           git add .
           git commit -m 'Trigger sync on ArgoCD @ `${{ github.sha }}`'
 
-      - name: Push
+      - name: Push changes
         uses: ad-m/github-push-action@master
 

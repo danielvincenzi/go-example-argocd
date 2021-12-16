@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    paths-ignore:
+    paths:
       # - "docs/**"
-      - "kubernetes/**"
+      - "terraform/**"
+  pull_request:
+    paths:
+      # - "docs/**"
+      - "terraform/**"
 
 defaults:
   run:
