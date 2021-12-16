@@ -76,11 +76,11 @@ jobs:
         run: |
           kustomize edit set image go-example-argocd=260712519057.dkr.ecr.us-east-1.amazonaws.com/go-example-argocd:${{ github.sha }}
 
-      - name: Commit
+      - name: Commit changes
         run: |
-          git config --local user.name 'github-actions[ bot ]'
+          git config --local user.name 'letsrockthefuturebot'
           git add .
-          git commit -m 'Trigger ArgoCD sync (`${{ github.sha }}`)'
+          git commit -m 'Trigger ArgoCD sync'
 
       - name: Push changes
         uses: ad-m/github-push-action@master
